@@ -34,4 +34,35 @@ describe("model creation tests", () => {
     expect(cheese1.title).toBe("Cheddar");
     expect(cheese1.description).toBe("scrumptious");
   });
+
+  describe("Association test", () => {
+    test("User can have many Boards", async () => {
+      await sequelize.sync({ force: true });
+
+      let user1 = await User.create({
+        name: "Jonny",
+        email: "jonny@gmail.com",
+      });
+
+      let board1 = await Board.create({
+        type: "checkered",
+        description: "Black & White",
+        rating: 9,
+      });
+
+      let board2 = await Board.create({
+        type: "Soft-cheese",
+        description: "green",
+        rating: 8,
+      });
+
+      await user1.addBoard(board1);
+      await user1.addBoard(board2);
+
+      let boards = await user1.getBoards();
+
+      expect(boards.length).toBe(2);
+      expect(boards[0] instanceof Board).toBeTruthy;
+    });
+  });
 });
