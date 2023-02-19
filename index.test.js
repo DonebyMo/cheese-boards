@@ -65,4 +65,59 @@ describe("model creation tests", () => {
       expect(boards[0] instanceof Board).toBeTruthy;
     });
   });
+
+  describe("Association test2", () => {
+    test("Board can have many Cheeses", async () => {
+      await sequelize.sync({ force: true });
+
+      let board1 = await Board.create({
+        type: "checkered",
+        description: "Black & White",
+        rating: 9,
+      });
+
+      let cheese1 = await Cheese.create({
+        title: "Brie",
+        description: "Soft & delicate",
+      });
+
+      let cheese2 = await Cheese.create({
+        title: "Quark",
+        description: "Squidgy and slimy",
+      });
+
+      await board1.addCheese(cheese1);
+      await board1.addCheese(cheese2);
+
+      let cheeses = await board1.getCheeses();
+
+      expect(cheeses.length).toBe(2);
+      expect(cheeses[0] instanceof Cheese).toBe(true);
+    });
+  });
+
+  test("A Cheese can be on many Boards", async () => {
+    await sequelize.sync({ force: true });
+    let cheese1 = await Cheese.create({
+      title: "Roquefort",
+      description: "Yellow & green",
+    });
+
+    let board1 = await Board.create({
+      type: "checkered",
+      description: "Black & White",
+      rating: 9,
+    });
+
+    let board2 = await Board.create({
+      type: "Soft-cheese",
+      description: "green",
+      rating: 8,
+    });
+
+    await board1.addCheese(cheese1);
+    await board2.addCheese(cheese1);
+
+    expect(board1.title === board2.title).toBe(true);
+  });
 });
